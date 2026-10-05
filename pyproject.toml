@@ -20,7 +20,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 tap-revcrm = "tap_revcrm.tap:TapRevCRM.cli"
-revcrm = "tap_revcrm.tap:TapRevCRM.cli"
 
 [tool.tox]
 requires = [
