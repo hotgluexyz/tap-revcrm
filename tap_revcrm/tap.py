@@ -7,13 +7,11 @@ from hotglue_singer_sdk import typing as th  # JSON schema typing helpers
 from typing_extensions import override
 
 from tap_revcrm.streams import (
-    ConstituentsStream,
-    ContactsStream,
+    DonorsStream,
 )
 
 STREAM_TYPES = [
-    ConstituentsStream,
-    ContactsStream,
+    DonorsStream,
 ]
 
 

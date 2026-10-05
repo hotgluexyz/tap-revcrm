@@ -1,13 +1,11 @@
 """Tests standard tap features using the built-in SDK tests library."""
 
 import datetime
-import json
 
 import pytest
 from hotglue_singer_sdk.testing import get_standard_tap_tests
-from requests import Response
 
-from tap_revcrm.streams import ContactsStream
+from tap_revcrm.streams import DonorsStream
 from tap_revcrm.tap import TapRevCRM
 
 SAMPLE_CONFIG = {
@@ -33,42 +31,19 @@ def test_standard(test_func):
     test_func()
 
 
-def test_contacts_flatten_email_and_derives_opt_in():
-    response = Response()
-    response.status_code = 200
-    response._content = json.dumps(
-        {
-            "items": [
-                {
-                    "roi_family_id": "42",
-                    "name_first": "Ada",
-                    "name_last": "Lovelace",
-                    "do_not_contact": "false",
-                    "email_addresses": [
-                        {
-                            "email_id": "99",
-                            "email_address": "ada@example.org",
-                            "contact_status": "Y",
-                        }
-                    ],
-                },
-                {
-                    "roi_family_id": "43",
-                    "do_not_contact": "true",
-                    "email_addresses": [
-                        {
-                            "email_id": "100",
-                            "email_address": "opted-out@example.org",
-                            "contact_status": "Y",
-                        }
-                    ],
-                },
-            ]
-        }
-    ).encode()
+def test_donors_add_per_email_opt_in_status():
+    donor = {
+        "do_not_contact": "false",
+        "email_addresses": [{"contact_status": "Y"}],
+    }
+    opted_out_donor = {
+        "do_not_contact": "true",
+        "email_addresses": [{"contact_status": "Y"}],
+    }
 
-    records = list(ContactsStream.parse_response(object.__new__(ContactsStream), response))
-
-    assert records[0]["opt_in"] is True
-    assert records[0]["name_first"] == "Ada"
-    assert records[1]["opt_in"] is False
+    assert DonorsStream.post_process(object.__new__(DonorsStream), donor)["email_addresses"][0][
+        "opt_in"
+    ]
+    assert not DonorsStream.post_process(object.__new__(DonorsStream), opted_out_donor)[
+        "email_addresses"
+    ][0]["opt_in"]

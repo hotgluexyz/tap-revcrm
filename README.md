@@ -7,14 +7,13 @@ A [Singer](https://www.singer.io/) tap that extracts data from **RevCRM**. It is
 - OAuth 2.0 client-credentials authentication through RevCRM's Auth0 tenant.
 - RevCRM `ROI-CLIENT-CODE` request header for tenant isolation.
 - Paginated donor extraction with email sub-resources included in each page.
-- A boolean `opt_in` contact field: true only when the email `contact_status` is `Y` and the donor is not marked `do_not_contact`.
+- A boolean `opt_in` field on each included email: true only when the email `contact_status` is `Y` and the donor is not marked `do_not_contact`.
 
 ### Streams
 
 | Stream | Endpoint / notes | Primary key | Replication key |
 | ------ | ---------------- | ----------- | ----------------- |
-| `constituents` | `GET /donors/?include=emails` | `roi_family_id` | `modified_date` |
-| `contacts` | Email resources flattened from `GET /donors/?include=emails` | `email_id` | `last_change_date` |
+| `donors` | `GET /donors/?include=emails` | `roi_family_id` | `modified_date` |
 
 RevCRM allows at most 500 requests per rolling five-minute window. Its donor endpoint requires a search criterion and returns at most 999 matching donors; configure the criterion with `search_parameters`.
 
